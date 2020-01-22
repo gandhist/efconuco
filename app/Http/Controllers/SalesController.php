@@ -512,5 +512,8 @@ class SalesController extends Controller
         $data = StockInventory::select(DB::raw('count(stock_inventory.is_taken) as current_stock'))
             ->where('stock_inventory.is_taken','0')->where('stock_inventory.id_barang',$id)->groupBy('stock_inventory.id_barang')->get();
         return $data;
+
+
+        
     }
 }
