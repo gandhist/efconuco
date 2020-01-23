@@ -85,7 +85,7 @@
 
             {{-- sub menu  --}}
             <div style="margin-bottom: 20px">
-                <a href="{{url('purchase/create')}}" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Buat Transaksi</a>
+               
             </div>
 
             @if(session('status'))

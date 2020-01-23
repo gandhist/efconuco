@@ -47,6 +47,7 @@ Route::group(['middleware' => 'authorization:pembelian'], function () {
 		route::get('show/{id}','PurchaseRequestController@show')->name('show_pr');
 		route::patch('update/{id}','PurchaseRequestController@update');
 		route::post('destroy/{id}','PurchaseRequestController@destroy')->name('delete_pr');
+		route::post('remove_item','PurchaseRequestController@removeItem');
 		route::post('list','PurchaseRequestController@pr_list')->name('pr_list');
 	});
 });
@@ -76,6 +77,7 @@ Route::group(['middleware' => 'authorization:sales'], function () {
 		route::get('show/{id}','SalesController@show')->name('show_so');
 		route::patch('update/{id}','SalesController@update');
 		route::post('destroy/{id}','SalesController@destroy')->name('delete_so');
+		route::post('remove_item','SalesController@removeItem');
 		route::post('list','SalesController@so_list')->name('so_list');
 		route::get('get_prop/{id}','SalesController@barang_prop')->name('get_barang_prop');
 	});

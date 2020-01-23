@@ -514,4 +514,24 @@ class PurchaseRequestController extends Controller
         }
     } // end of destroy
 
+    // remove item list
+    public function removeItem(Request $request)
+    {
+        $id = $request->id_header;
+        $header = PurchaseRequestModel::find($id);
+        $header->updated_by = Auth::id();
+        $header->updated_at = Carbon::now()->toDateTimeString();
+        if($header->save()){
+            $details = [
+                'deleted_by' => Auth::id(),
+                'deleted_at' => Carbon::now()->toDateTimeString()
+            ];
+            PurchaseRequestDetailsModel::find($request->id_details)->where('pr_header',$id)->update($details);
+            return response()->json([
+                'status' => true,
+                'message' => 'Item berhasil dihapus'
+            ], 200);
+        }
+    }
+
 }  // end of controller

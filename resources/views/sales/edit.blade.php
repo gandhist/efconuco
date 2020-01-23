@@ -77,8 +77,8 @@
                             <div class="form-group">
                                 <label for="tipe">Tipe</label>
                                 <select class="form-control select2" name="tipe" id="tipe" required style="width: 100%;">
-                                    <option {{ $so_header->baja = "BARANG" ? 'selected' : '' }} value="BARANG">Barang</option>
-                                    <option {{ $so_header->baja = "JASA"   ? 'selected' : '' }} value="JASA">Jasa</option>
+                                    <option {{ $so_header->baja == "BARANG" ? 'selected' : '' }} value="BARANG">Barang</option>
+                                    <option {{ $so_header->baja == "JASA"   ? 'selected' : '' }} value="JASA">Jasa</option>
                                 </select>
                             </div>
                         </div>
@@ -95,8 +95,8 @@
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select class="form-control select2" name="status">
-                                    <option {{ $so_header->baja = "LUNAS" ? 'selected' : '' }} value="LUNAS">Lunas</option>
-                                    <option {{ $so_header->baja = "DP"    ? 'selected' : '' }} value="DP">Belum Lunas</option>
+                                    <option {{ $so_header->status == "LUNAS" ? 'selected' : '' }} value="LUNAS">Lunas</option>
+                                    <option {{ $so_header->status == "DP"    ? 'selected' : '' }} value="DP">Belum Lunas</option>
                                 </select>
                                 <span class="help-block" >{{ $errors->first('status') }} </span>
                             </div>
@@ -153,7 +153,7 @@
 
                     <div class="box-footer">
                             <a href="{{url("sales")}}" class="btn btn-default">Cancel</a>
-                            <button type="button" id="submit" name="submit" onclick="store()" class="btn btn-primary">Create Data</button>
+                            <button type="button" id="submit" name="submit" onclick="store()" class="btn btn-primary">Update Data</button>
                     </div>
                 </form>
                 
@@ -179,7 +179,7 @@
             <tbody>
                 <?php  $last_iteration = 1;  ?>
                 @foreach ($so_details as $item)
-                <tr class="tr_item">
+                <tr class="tr_item" id="tr_item_{{ $loop->iteration }}">
                     <td scope="col">{{ $loop->iteration }}</td>
                     <input type="hidden" class="item_ls form-control" value="{{ $item->id }}" name="item_id_{{ $loop->iteration }}" id="item_id_{{ $loop->iteration }}"> 
                             {{-- pembeda ketika di controller item_id_update ini akan mengupdate, jika tambah baru maka dia akan create data baru --}}
@@ -229,7 +229,7 @@
                                 <p id="harga_total_item_show_{{ $loop->iteration }}">{{ "Rp. " . number_format($item->jumlah,2,',','.')  }}</p>
                     </td>
                     <td>
-                                <button type='button' onclick="$(this).closest('tr').remove(); removeItem();" class="btn btn-danger btn-sm" ><span class="fa fa-trash" ></span></button> 
+                                <button type='button' data-id='{{ $loop->iteration }}' onclick="RemoveItemEdit('{{ $id}} ', '{{$item->id}}', $(this).data('id'))" class="btn btn-danger btn-sm" ><span class="fa fa-trash" ></span></button> 
                     </td>
                </tr>
                <?php  $last_iteration = $loop->iteration +1;  ?>
@@ -420,6 +420,51 @@
 
 
     });  // end function
+
+    
+
+    // write all function here
+
+    // function remove item
+    function RemoveItemEdit(id_header, id_details, running_number)
+    {
+        var url = "{{ url('sales/remove_item') }}";
+        $('#tr_item_'+running_number).remove();
+        grand_total()
+        $.ajaxSetup({
+           headers: {
+               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+           }
+            });
+            $.ajax(
+            {
+                url: url,
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    "id_header" : id_header,
+                    "id_details" : id_details
+                },
+                success: function (response)
+                {        
+                $("#modal-konfirmasi").modal('hide');
+                Swal.fire({
+                    title: response.message,
+                    text: response.message,
+                    type: 'success',
+                    confirmButtonText: 'Close',
+                    confirmButtonColor: '#AAA',
+                    onClose: function(){
+                        
+                    }
+                })
+                },
+                error: function(xhr) {
+                console.log(xhr.responseText);
+                }
+            });
+    }
+
 
     // fungsi rupiah convert
     function convertToRupiah(angka)

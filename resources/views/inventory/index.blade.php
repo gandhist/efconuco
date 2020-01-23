@@ -4,7 +4,7 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        Inventory
+        Inventory Stock Information
         {{-- <small>it all starts here</small>  --}}
     </h1>
     <ol class="breadcrumb">
@@ -85,7 +85,7 @@
 
             {{-- sub menu  --}}
             <div style="margin-bottom: 20px">
-                <a href="{{url('purchase/create')}}" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Buat Transaksi</a>
+                
             </div>
 
             @if(session('status'))

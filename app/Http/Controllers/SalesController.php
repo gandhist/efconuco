@@ -269,10 +269,10 @@ class SalesController extends Controller
         $data['uom'] = MasterUom::all();
         $data['master_baja'] = MasterStock::all();
         $data['vendor'] = MasterVendor::all();
-        $data['pr_header'] = PurchaseRequestModel::find($id);
-        $data['pr_details'] = PurchaseRequestDetailsModel::where('pr_header',$id)->get();
+        $data['so_header'] = SalesModel::find($id);
+        $data['so_details'] = SalesDetailsModel::where('so_header',$id)->get();
         $data['id'] = $id;
-        return view('pr.edit',$data);
+        return view('sales.show',$data);
     }
 
     /**
@@ -408,24 +408,6 @@ class SalesController extends Controller
                     }
                     // jika data lama
                     else {
-                        $data_details = [
-                            'so_header' => $header->id,
-                            'no_invoice' => $request->trans_no,
-                            'id_barang' => $request->input($px_nama.$i),
-                            'qty' => $request->input($px_qty.$i),
-                            'harga_satuan' => $request->input($px_price.$i),
-                            'jumlah' => $request->input($px_price_total.$i),
-                            'ppn' => $request->input($px_ppn.$i),
-                            'pph_23' => $request->input($px_pph23.$i),
-                            'pph_4' => $request->input($px_pph4.$i),
-                            'discount' => $request->input($px_discount.$i),
-                            'desc' => $request->input($px_desc.$i),
-                            'updated_by' => Auth::id(),
-                            'updated_at' => Carbon::now()->toDateTimeString(),
-                        ];
-                        // restore yang istaken kembali menjadi default
-                        // lalu update ulang
-                        $update_details = SalesDetailsModel::find($request->input($px_item_id.$i))->update($data_details);
                         $cek_details = SalesDetailsModel::where('id_barang',$request->input($px_nama.$i))->where('no_invoice',$request->trans_no)->get(['qty']);
                         if ($request->input($px_qty.$i) != $cek_details[0]->qty) {
                             // balikan datanya menjadi default
@@ -458,26 +440,39 @@ class SalesController extends Controller
                                             ]
                                         );
                                     } // end for looping qty
+                                         
                                 } // end if restore data
                         }
-
+                        $data_details = [
+                            'so_header' => $header->id,
+                            'no_invoice' => $request->trans_no,
+                            'id_barang' => $request->input($px_nama.$i),
+                            'qty' => $request->input($px_qty.$i),
+                            'harga_satuan' => $request->input($px_price.$i),
+                            'jumlah' => $request->input($px_price_total.$i),
+                            'ppn' => $request->input($px_ppn.$i),
+                            'pph_23' => $request->input($px_pph23.$i),
+                            'pph_4' => $request->input($px_pph4.$i),
+                            'discount' => $request->input($px_discount.$i),
+                            'desc' => $request->input($px_desc.$i),
+                            'updated_by' => Auth::id(),
+                            'updated_at' => Carbon::now()->toDateTimeString(),
+                        ];
+                        // restore yang istaken kembali menjadi default
+                        // lalu update ulang
+                        $update_details = SalesDetailsModel::find($request->input($px_item_id.$i))->update($data_details);
                     }
                     
                     
                 } // end if
             } // end for loop
-            if ($save_details) {
+            if ($update_details || $save_details) {
                 return response()->json([
                     'status' => true,
-                    'message' => 'data penjualan berhasil di simpan'
+                    'message' => 'data penjualan berhasil di perbarui'
                 ], 202);    
             }
-            else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'data penjualan gagal di simpan'
-                ], 404);    
-            }
+            
         }
 
     }
@@ -512,8 +507,42 @@ class SalesController extends Controller
         $data = StockInventory::select(DB::raw('count(stock_inventory.is_taken) as current_stock'))
             ->where('stock_inventory.is_taken','0')->where('stock_inventory.id_barang',$id)->groupBy('stock_inventory.id_barang')->get();
         return $data;
-
-
-        
     }
+
+    // remove item list
+    public function removeItem(Request $request)
+    {
+        $id = $request->id_header;
+        $header = SalesModel::find($id);
+        $header->updated_by = Auth::id();
+        $header->updated_at = Carbon::now()->toDateTimeString();
+        if($header->save()){
+            $details = [
+                'deleted_by' => Auth::id(),
+                'deleted_at' => Carbon::now()->toDateTimeString()
+            ];
+            $qty = SalesDetailsModel::where('id',$request->id_details)->where('so_header',$id)->get();
+            $restore_data = DB::table('stock_inventory')
+                                ->where('id_barang', $qty[0]->id_barang)
+                                ->where('is_taken', 1)->where('no_sales_order',$qty[0]->no_invoice)
+                                ->update(
+                                    [
+                                        'is_taken' => 0,
+                                        'taken_by' => "(NULL)",
+                                        'no_sales_order' => "(NULL)",
+                                        'updated_by' => Auth::id(),
+                                        'updated_at' => Carbon::now()->toDateTimeString()
+                                    ]
+                                );
+            $remove_details = SalesDetailsModel::where('id',$request->id_details)->where('so_header',$id)->update($details);
+
+            if ($remove_details) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Item berhasil dihapus'
+                ], 200);
+            }
+        }
+    }
+
 }
