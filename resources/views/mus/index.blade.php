@@ -4,13 +4,13 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        Inventory Stock Information
+        Material Usage
         {{-- <small>it all starts here</small>  --}}
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
         <li><a href="#"><i class="fa fa-dashboard"></i> Inventory</a></li>
-        <li class="active"><a href="#"> Stock Information</a></li>
+        <li class="active"><a href="#"> Material Usage</a></li>
     </ol>
 </section>
 
@@ -85,7 +85,7 @@
 
             {{-- sub menu  --}}
             <div style="margin-bottom: 20px">
-                
+                <a href="{{ url('mus/create') }}" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Pengambilan Barang</a>
             </div>
 
             @if(session('status'))
@@ -102,12 +102,9 @@
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Nama Barang</th>
-                            <th>Kode Barang</th>
-                            <th>PR Number</th>
-                            <th>Current Stock</th>
-                            <th>Status</th>
-                            <th>Bukti Bayar</th>
+                            <th>No Transaksi</th>
+                            <th>Request By</th>
+                            <th>Tanggal</th>
                             <th>Remarks</th>
                             <th width="10%">Action</th>
                         </tr>
@@ -152,7 +149,7 @@
 
 <script>
 $(function() {
-    var url = "{{ route('inventory_list') }}";
+    var url = "{{ route('mus_list') }}";
 $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -178,12 +175,9 @@ $.ajaxSetup({
    },
    columns : [
         {data : 'no'},
-        {data : 'nama_barang'},
-        {data : 'kode_barang'},
-        {data : 'pr_number'},
-        {data : 'current_stock'},
-        {data : 'status'},
-        {data : 'paid_date_file'},
+        {data : 'trans_no'},
+        {data : 'request_by'},
+        {data : 'tanggal'},
         {data : 'remarks'},
         {data : 'action'}
      ],
@@ -207,7 +201,7 @@ var selectedRow;
      $("#modal-konfirmasi").modal('show');
  
      $("#modal-konfirmasi").find("#confirm-delete").data("id", $(this).data('id'));
-     $("#konfirmasi-body").text("Hapus Transaksi Pembelian?");
+     $("#konfirmasi-body").text("Hapus Transaksi Pengambilan?");
    });
    $('#btnFilter').click(function() {
        //alert('dumbass');

@@ -84,6 +84,23 @@ Route::group(['middleware' => 'authorization:sales'], function () {
 });
 // end of route sales
 
+// route sales
+Route::group(['middleware' => 'authorization:mus'], function () {
+	Route::group(['prefix'=>'mus'], function (){
+		route::get('/','MusController@index');
+		route::get('create','MusController@create');
+		route::post('store','MusController@store');
+		route::get('edit/{id}','MusController@edit')->name('edit_mus');
+		route::get('show/{id}','MusController@show')->name('show_mus');
+		route::patch('update/{id}','MusController@update');
+		route::post('destroy/{id}','MusController@destroy')->name('delete_mus');
+		route::post('remove_item','MusController@removeItem');
+		route::post('list','MusController@mus_list')->name('mus_list');
+		route::get('get_prop/{id}','MusController@barang_prop')->name('get_barang_prop');
+	});
+});
+// end of route sales
+
 // Report
 
 Route::group(['prefix' => 'report'], function () {

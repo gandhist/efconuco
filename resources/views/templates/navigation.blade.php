@@ -173,7 +173,7 @@
             </a>
           </li>
           <li class="">
-            <a href="{{ url('stock/restock') }}">
+            <a href="{{ url('mus') }}">
               <i class="fa fa-circle-o"></i> <span>Material Usage</span>
             </a>
           </li>

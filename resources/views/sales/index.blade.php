@@ -161,6 +161,11 @@ $.ajaxSetup({
     var mainTable = $('#data-table').DataTable({
     processing : true,
     serverSide : true,
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    dom: 'Blfrtip',
+    buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+    ],
     ajax : {
         url : url,
         dataType : 'JSON',
